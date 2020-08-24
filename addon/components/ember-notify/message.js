@@ -23,6 +23,7 @@ export default Component.extend({
   init() {
     this._super(...arguments);
 
+    this.set('message.container', this);
     // Indicate that the message is now being displayed
     if (this.message.visible === undefined) {
       // Should really be in didInsertElement but Glimmer doesn't allow this
@@ -35,14 +36,11 @@ export default Component.extend({
 
     let { closeAfter = this.closeAfter, element } = this.message;
     if (element) {
-      if (isArray(element)) {
-        // eslint-disable-line ember/no-jquery
-        this.$('.message').append(element);
-      } else {
-        this.element
-          .querySelector('.message')
-          .appendChild(element);
-      }
+      const message = this.element.querySelector('.message');
+      const append = isArray(element)
+        ? message.append.bind(message)
+        : message.appendChild.bind(message);
+      append(element);
     }
 
     if (closeAfter) {
